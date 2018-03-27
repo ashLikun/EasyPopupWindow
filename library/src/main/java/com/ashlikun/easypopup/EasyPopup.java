@@ -1,6 +1,8 @@
 package com.ashlikun.easypopup;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -14,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.PopupWindow;
 
 /**
@@ -27,6 +30,7 @@ import android.widget.PopupWindow;
 public class EasyPopup implements PopupWindow.OnDismissListener {
 
     private static final float DEFAULT_DIM = 0.7f;
+    private static final float DEFAULT_WINDOW_ALPHA_ORGIN = 1.666f;
 
     //PopupWindow对象
     private PopupWindow mPopupWindow;
@@ -37,9 +41,14 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
     protected View mContentView;
     //布局id
     protected int mLayoutId;
-    //点击popup外部是否消失
-    private boolean dismissWhenTouchOuside = true;
-
+    //获取焦点
+    protected boolean mFocusable = true;
+    //是否触摸之外dismiss
+    protected boolean mOutsideTouchable = true;
+    //弹出pop时，背景是否变暗
+    protected boolean isBackgroundAlpha = false;
+    protected float mBackgroundAlpha = .6f;
+    protected float mWindowAlphaOrgin = DEFAULT_WINDOW_ALPHA_ORGIN;
     //宽高
     protected int mWidth;
     protected int mHeight;
@@ -47,7 +56,6 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
     protected int mAnimationStyle;
 
     private PopupWindow.OnDismissListener mOnDismissListener;
-
 
 
     private View mAnchorView;
@@ -114,16 +122,13 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
         } else {
             mPopupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         }
-
         onPopupWindowViewCreated(mContentView);
-
         if (mAnimationStyle != 0) {
             mPopupWindow.setAnimationStyle(mAnimationStyle);
         }
-
-        mPopupWindow.setFocusable(dismissWhenTouchOuside);
-        mPopupWindow.setOutsideTouchable(dismissWhenTouchOuside);
-        mPopupWindow.setBackgroundDrawable(dismissWhenTouchOuside ? new ColorDrawable(Color.TRANSPARENT) : null);
+        mPopupWindow.setFocusable(mFocusable);
+        mPopupWindow.setOutsideTouchable(mOutsideTouchable);
+        mPopupWindow.setBackgroundDrawable(mOutsideTouchable ? new ColorDrawable(Color.TRANSPARENT) : null);
         mPopupWindow.setOnDismissListener(this);
 
         return (T) this;
@@ -139,10 +144,12 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
 
     /**
      * contentView创建完成，这个时候就可以开启进入动画
+     *
      * @param contentView
      */
     protected void onPopupWindowViewCreated(View contentView) {
     }
+
     /**
      * contentView创建完成，这个时候就可以开启退出动画
      */
@@ -192,9 +199,35 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
         return (T) this;
     }
 
-
+    /**
+     * 设置按下消失
+     */
     public <T extends EasyPopup> T setDismissWhenTouchOuside(boolean dismissWhenTouchOuside) {
-        this.dismissWhenTouchOuside = dismissWhenTouchOuside;
+        this.mOutsideTouchable = dismissWhenTouchOuside;
+        this.mFocusable = dismissWhenTouchOuside;
+        return (T) this;
+    }
+
+    /**
+     * 设置是否可以获取焦点
+     */
+    public <T extends EasyPopup> T setFocusable(boolean mFocusable) {
+        this.mFocusable = mFocusable;
+        return (T) this;
+    }
+
+    /**
+     * 设置点击空白地方消失
+     */
+    public <T extends EasyPopup> T setOutsideTouchable(boolean mOutsideTouchable) {
+        this.mOutsideTouchable = mOutsideTouchable;
+        return (T) this;
+    }
+
+
+    public <T extends EasyPopup> T setBackgroundAlpha(boolean backgroundDim, float mBackgroundAlpha) {
+        this.isBackgroundAlpha = backgroundDim;
+        this.mBackgroundAlpha = mBackgroundAlpha;
         return (T) this;
     }
 
@@ -224,7 +257,9 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
             mOffsetX = offsetX;
             mOffsetY = offsetY;
             addGlobalLayoutListener(mPopupWindow.getContentView());
+            handleBackgroundAlpha(true);
             mPopupWindow.showAsDropDown(anchor, offsetX, offsetY);
+
         }
     }
 
@@ -233,6 +268,7 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
             mAnchorView = anchor;
             isOnlyGetWH = true;
             addGlobalLayoutListener(mPopupWindow.getContentView());
+            handleBackgroundAlpha(true);
             mPopupWindow.showAsDropDown(anchor);
         }
     }
@@ -245,6 +281,7 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
             mOffsetY = offsetY;
             isOnlyGetWH = true;
             addGlobalLayoutListener(mPopupWindow.getContentView());
+            handleBackgroundAlpha(true);
             mPopupWindow.showAtLocation(parent, gravity, offsetX, offsetY);
         }
     }
@@ -299,7 +336,42 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
 
         x = calculateX(anchor, horizGravity, measuredW, x);
         y = calculateY(anchor, vertGravity, measuredH, y);
+        handleBackgroundAlpha(true);
         PopupWindowCompat.showAsDropDown(mPopupWindow, anchor, x, y, Gravity.NO_GRAVITY);
+    }
+
+    /**
+     * 处理背景变暗
+     *
+     * @param isShow 是否是弹出时候调用的
+     */
+    private void handleBackgroundAlpha(boolean isShow) {
+        if (isBackgroundAlpha) {
+            Activity activity = getActivity(mContext);
+            if (activity != null) {
+                WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+                if (isShow && mWindowAlphaOrgin == DEFAULT_WINDOW_ALPHA_ORGIN) {
+                    mWindowAlphaOrgin = lp.alpha;
+                }
+                lp.alpha = isShow ? mBackgroundAlpha : mWindowAlphaOrgin;
+                activity.getWindow().setAttributes(lp);
+            }
+        }
+    }
+
+    /**
+     * 方法功能：从context中获取activity，如果context不是activity那么久返回null
+     */
+    private Activity getActivity(Context context) {
+        if (context == null) {
+            return null;
+        }
+        if (context instanceof Activity) {
+            return (Activity) context;
+        } else if (context instanceof ContextWrapper) {
+            return getActivity(((ContextWrapper) context).getBaseContext());
+        }
+        return null;
     }
 
     /**
@@ -496,6 +568,7 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
             mPopupWindow.dismiss();
         }
         onPopupWindowDismiss();
+        handleBackgroundAlpha(false);
     }
 
     private void addGlobalLayoutListener(View contentView) {

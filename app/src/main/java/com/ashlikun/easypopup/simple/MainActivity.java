@@ -15,8 +15,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClick(View view) {
-        EasyPopup popup = new EasyPopup(this,R.layout.popup_view);
+        EasyPopup popup = new EasyPopup(this, R.layout.popup_view);
+        popup.setHeight(500);
         popup.create();
+        popup.setBackgroundAlpha(true,.4f);
         popup.showAsDropDown(view);
     }
 }
