@@ -16,7 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
 /**
@@ -340,6 +341,8 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
         PopupWindowCompat.showAsDropDown(mPopupWindow, anchor, x, y, Gravity.NO_GRAVITY);
     }
 
+    View backgoundView = null;
+
     /**
      * 处理背景变暗
      *
@@ -349,12 +352,34 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
         if (isBackgroundAlpha) {
             Activity activity = getActivity(mContext);
             if (activity != null) {
-                WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
-                if (isShow && mWindowAlphaOrgin == DEFAULT_WINDOW_ALPHA_ORGIN) {
-                    mWindowAlphaOrgin = lp.alpha;
+                View decorView = activity.getWindow().getDecorView();
+                FrameLayout rootView = (FrameLayout) decorView.findViewById(android.R.id.content);
+                if (isShow) {
+                    backgoundView = new View(activity);
+                    //设置宽高为全屏
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams
+                            (LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                    backgoundView.setLayoutParams(layoutParams);
+                    //设置背景颜色为黑色，加上透明度，就会有半透明的黑色蒙版效果
+                    backgoundView.setBackgroundColor(0xff000000);
+                    //1.0f 不透明/0.0f 透明
+                    backgoundView.setAlpha(mBackgroundAlpha);
+                    rootView.addView(backgoundView);
+                } else {
+                    rootView.removeView(backgoundView);
                 }
-                lp.alpha = isShow ? mBackgroundAlpha : mWindowAlphaOrgin;
-                activity.getWindow().setAttributes(lp);
+//                WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+//                if (isShow && mWindowAlphaOrgin == DEFAULT_WINDOW_ALPHA_ORGIN) {
+//                    mWindowAlphaOrgin = lp.alpha;
+//                }
+////                lp.flags = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+//                if (isShow) {
+//                    activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+//                } else {
+//                    activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+//                }
+//                lp.alpha = isShow ? mBackgroundAlpha : mWindowAlphaOrgin;
+//                activity.getWindow().setAttributes(lp);
             }
         }
     }
