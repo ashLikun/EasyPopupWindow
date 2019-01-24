@@ -30,12 +30,8 @@ import android.widget.PopupWindow;
 
 public class EasyPopup implements PopupWindow.OnDismissListener {
 
-    private static final float DEFAULT_DIM = 0.7f;
-    private static final float DEFAULT_WINDOW_ALPHA_ORGIN = 1.666f;
-
     //PopupWindow对象
     private PopupWindow mPopupWindow;
-
     //context
     private Context mContext;
     //contentView
@@ -49,11 +45,11 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
     //弹出pop时，背景是否变暗
     protected boolean isBackgroundAlpha = false;
     protected float mBackgroundAlpha = .6f;
-    protected float mWindowAlphaOrgin = DEFAULT_WINDOW_ALPHA_ORGIN;
     //宽高
     protected int mWidth;
     protected int mHeight;
-
+    //弹出时候的背景
+    protected View backgoundView = null;
     protected int mAnimationStyle;
 
     private PopupWindow.OnDismissListener mOnDismissListener;
@@ -341,7 +337,6 @@ public class EasyPopup implements PopupWindow.OnDismissListener {
         PopupWindowCompat.showAsDropDown(mPopupWindow, anchor, x, y, Gravity.NO_GRAVITY);
     }
 
-    View backgoundView = null;
 
     /**
      * 处理背景变暗
