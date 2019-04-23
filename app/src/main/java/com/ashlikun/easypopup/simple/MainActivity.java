@@ -1,11 +1,12 @@
 package com.ashlikun.easypopup.simple;
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 
 import com.ashlikun.easypopup.EasyPopup;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
     EasyPopup popup;
