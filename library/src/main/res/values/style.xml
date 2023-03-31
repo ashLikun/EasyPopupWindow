@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="EasyPopup" />
+
+    <style name="EasyPopup.Anim" />
+
+    <style name="EasyPopup.Anim.BottomToTop">
+        <item name="android:windowEnterAnimation">@anim/easy_popup_grow_from_bottom</item>
+        <item name="android:windowExitAnimation">@anim/easy_popup_shrink_from_top</item>
+    </style>
+
+    <style name="EasyPopup.Anim.TopToBottom">
+        <item name="android:windowEnterAnimation">@anim/easy_popup_grow_from_top</item>
+        <item name="android:windowExitAnimation">@anim/easy_popup_shrink_from_bottom</item>
+    </style>
+
+</resources>

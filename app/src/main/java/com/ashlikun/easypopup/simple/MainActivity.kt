@@ -1,26 +1,42 @@
 package com.ashlikun.easypopup.simple
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import com.ashlikun.easypopup.EasyPopup
+import com.ashlikun.easypopup.BaseEasyPopup
+import com.ashlikun.easypopup.simple.databinding.PopupViewBinding
 
 class MainActivity : AppCompatActivity() {
-    var popup: EasyPopup? = null
+    val popBinding by lazy {
+        PopupViewBinding.inflate(LayoutInflater.from(this))
+    }
+    val popup: BaseEasyPopup by lazy {
+        BaseEasyPopup(
+            this, width = dip2px(180f), maxHeight = dip2px(280f), dimAmount = 0.6f, layouView = popBinding.root
+        ){
+
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-        popup = EasyPopup(this, R.layout.popup_view)
-        popup!!.setWidth<EasyPopup>(1920)
-        popup!!.setBackgroundAlpha<EasyPopup>(true, 1f)
-        popup!!.create<EasyPopup>()
     }
 
-    fun onClick(view: View?) {
-        popup!!.showAsDropDown(view)
+    fun onClick(view: View) {
+        popup!!.show(view)
     }
 
-    fun onClick2(view: View?) {}
+    fun dip2px(dipValue: Float): Int {
+        val scale = resources.displayMetrics.density
+        return (dipValue * scale + 0.5f).toInt()
+    }
+
+    fun onClick2(view: View) {}
+    fun onClick3(view: View) {
+        popup!!.show(view)
+    }
 }

@@ -11,6 +11,7 @@
         //<item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@color/f1</item>
         <item name="android:dialogTheme">@style/dialog</item>
+        <item name="android:textColor">#FF000000</item>
     </style>
 
     <style name="dialog" parent="android:style/Theme.Dialog">
