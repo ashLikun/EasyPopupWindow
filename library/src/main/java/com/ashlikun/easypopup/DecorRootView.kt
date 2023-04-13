@@ -14,7 +14,7 @@ import android.widget.FrameLayout
  *
  * 功能介绍：pop根布局
  */
-class DecorRootView(context: Context, val popup: BaseEasyPopup) : FrameLayout(context) {
+class DecorRootView(context: Context, val popup: BasePopup) : FrameLayout(context) {
     //
     var myBackground: Drawable? = null
 
@@ -96,7 +96,7 @@ class DecorRootView(context: Context, val popup: BaseEasyPopup) : FrameLayout(co
     override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
         val showInfo = showInfo ?: return
-        if (popup.showArrow) {
+        if (popup is BaseCommonPopup && popup.showArrow) {
             //上下
             canvas.save()
             arrowPaint.style = Paint.Style.FILL

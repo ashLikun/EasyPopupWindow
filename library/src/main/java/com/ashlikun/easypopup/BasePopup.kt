@@ -3,18 +3,14 @@ package com.ashlikun.easypopup
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
-import android.util.DisplayMetrics
 import android.view.*
 import android.view.View.OnTouchListener
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.PopupWindow
 import androidx.annotation.IdRes
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.ViewCompat
-import kotlin.math.max
 
 /**
  * 作者　　: 李坤
@@ -24,7 +20,7 @@ import kotlin.math.max
  *
  * 功能介绍：是对官方的PopupWindows的封装，使得使用方便
  */
-open class BaseEasyPopup(
+open class BasePopup(
     //context
     open val context: Context,
     //布局
@@ -37,11 +33,8 @@ open class BaseEasyPopup(
     open var maxWidth: Int? = null,
     open var anchorView: View? = null,
     open val animStyle: Int? = R.style.EasyPopup_Anim_TopToBottom,
-    //在顶部显示时候的动画 前提是verticalGravity 是自动
-    open val animTopStyle: Int? = R.style.EasyPopup_Anim_BottomToTop,
     //是否触摸之外dismiss
     open var outsideTouchable: Boolean = true,
-
     //弹出pop时，背景是否变暗,null：不操作
     open var dimAmount: Float? = .6f,
     //获取焦点
@@ -52,21 +45,7 @@ open class BaseEasyPopup(
     //相对于描点的方向
     open var direction: Int = PopupDirection.AUTO_TOP_BOTTOM,
     open var gravity: Int = Gravity.CENTER,
-    //背景颜色
-    open var bgColor: Int = Color.WHITE,
-    //圆角 px
-    open var radius: Int = dip2px(context, 10f),
-    //圆角半径左上，右上，右下，左下或者8个值也可以4个值得一个 px
-    open var radiusArr: IntArray? = null,
-    //是否显示箭头
-    open var showArrow: Boolean = false,
-    open var arrowWidth: Int = dip2px(context, 10f),
-    open var arrowHeight: Int = dip2px(context, 10f),
-    open var borderWidth: Int = 1,
-    open var borderColor: Int = Color.BLACK,
-    //与anchor 的距离
-    open var anchorMargin: Int = 0,
-    open var elevation: Int = dip2px(context, 1f),
+    val isCallCreate: Boolean = true,
     open var onDismissListener: PopupWindow.OnDismissListener? = null
 ) {
     companion object {
@@ -91,7 +70,9 @@ open class BaseEasyPopup(
     }
 
     init {
-        init()
+        if (isCallCreate) {
+            onCreate()
+        }
     }
 
 
@@ -106,7 +87,7 @@ open class BaseEasyPopup(
     /**
      * 在构造函数外设置属性，请从新初始化
      */
-    fun init() {
+    open protected fun onCreate() {
         if (layouView == null) {
             if (layoutId != null) {
                 layouView = LayoutInflater.from(context).inflate(layoutId!!, null)
@@ -114,23 +95,6 @@ open class BaseEasyPopup(
                 throw IllegalArgumentException("The content view is null")
             }
         }
-        layouView!!.background = GradientDrawable().apply {
-            setColor(bgColor)
-            setStroke(borderWidth, borderColor)
-            when {
-                //使用全角
-                radius > 0 -> cornerRadius = radius.toFloat()
-                radiusArr?.size == 8 -> cornerRadii = radiusArr!!.map { it.toFloat() }.toFloatArray()
-                radiusArr?.size == 4 -> cornerRadii = floatArrayOf(
-                    radiusArr!![0].toFloat(), radiusArr!!!![0].toFloat(),
-                    radiusArr!![1].toFloat(), radiusArr!![1].toFloat(),
-                    radiusArr!![2].toFloat(), radiusArr!![2].toFloat(),
-                    radiusArr!![3].toFloat(), radiusArr!![3].toFloat()
-                )
-            }
-        }
-        ViewCompat.setElevation(layouView!!, elevation.toFloat())
-
         popupWindow.contentView = decorRootView
         onPopupWindowCreated(decorRootView)
         popupWindow.isTouchable = true
@@ -151,28 +115,28 @@ open class BaseEasyPopup(
     /**
      * contentView创建完成，这个时候就可以开启进入动画
      */
-    protected fun onPopupWindowCreated(contentView: View) {}
+    open protected fun onPopupWindowCreated(contentView: View) {}
 
     /**
      * contentView创建完成，这个时候就可以开启退出动画
      */
-    protected fun onPopupWindowDismiss() {}
+    open protected fun onPopupWindowDismiss() {}
 
     /**
      * 设置Window参数
      */
-    protected open fun onWindowLayoutParams(lp: WindowManager.LayoutParams) {}
+    open protected fun onWindowLayoutParams(lp: WindowManager.LayoutParams) {}
 
     /**
      * 设置按下消失
      */
-    fun setDismissWhenTouchOuside(dismissWhenTouchOuside: Boolean) {
+    open fun setDismissWhenTouchOuside(dismissWhenTouchOuside: Boolean) {
         outsideTouchable = dismissWhenTouchOuside
         focusable = dismissWhenTouchOuside
     }
 
 
-    fun show(anchor: View) {
+    open fun show(anchor: View) {
         if (isShowing()) return
         val showInfo = ShowInfo(anchor, this)
         anchorView = anchor
@@ -182,9 +146,9 @@ open class BaseEasyPopup(
         //从新设置宽高
         showInfo.reSetSize()
         showInfo.calculateXY()
+        onShowInfoCreate(showInfo)
         decorRootView.showInfo = showInfo
         popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, offsetX + showInfo.x, offsetY + showInfo.y)
-
         //创建完成处理背景变暗
         updateDimAmount()
     }
@@ -197,7 +161,14 @@ open class BaseEasyPopup(
         }
     }.getOrNull()
 
-    private fun updateDimAmount() {
+    /**
+     * 当ShowInfo创建后
+     */
+    protected open fun onShowInfoCreate(showInfo: ShowInfo) {
+        popupWindow.animationStyle = animStyle ?: -1
+    }
+
+    protected open fun updateDimAmount() {
         if (dimAmount != null) {
             getDecorView()?.also {
                 val p = it.layoutParams as WindowManager.LayoutParams
@@ -265,4 +236,6 @@ open class BaseEasyPopup(
             layouView!!.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
         }
     }
+
+
 }

@@ -5,15 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import com.ashlikun.easypopup.BaseEasyPopup
+import com.ashlikun.easypopup.BaseCommonPopup
 import com.ashlikun.easypopup.simple.databinding.PopupViewBinding
 
 class MainActivity : AppCompatActivity() {
     val popBinding by lazy {
         PopupViewBinding.inflate(LayoutInflater.from(this))
     }
-    val popup: BaseEasyPopup by lazy {
-        BaseEasyPopup(
+    val popup: BaseCommonPopup by lazy {
+        BaseCommonPopup(
             this, width = dip2px(180f), maxHeight = dip2px(280f), dimAmount = 0.6f, layouView = popBinding.root
         ){
 

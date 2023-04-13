@@ -16,7 +16,7 @@ import kotlin.math.max
  *
  * 功能介绍：
  */
-class ShowInfo(anchor: View, val popup: BaseEasyPopup) {
+class ShowInfo(anchor: View, val popup: BasePopup) {
 
     //锚点View 宽度
     val anchorHeight = anchor.height
@@ -210,55 +210,8 @@ class ShowInfo(anchor: View, val popup: BaseEasyPopup) {
         viewFrame.top = y
         viewFrame.right = x + width
         viewFrame.bottom = y + height
-        setAnim()
-        setContentLayout()
     }
 
-    private fun setContentLayout() {
-        var paddingLeft = 0
-        var paddingTop = 0
-        var paddingRight = 0
-        var paddingBottom = 0
-        when (direction) {
-            //左边
-            1 -> {
-                paddingRight = popup.anchorMargin
-                if (popup.showArrow) {
-                    paddingRight += popup.arrowHeight
-                }
-            }
-            //上方
-            2 -> {
-                paddingBottom = popup.anchorMargin
-                if (popup.showArrow) {
-                    paddingBottom += popup.arrowHeight
-                }
-            }
-            //右方
-            3 -> {
-                paddingLeft = popup.anchorMargin
-                if (popup.showArrow) {
-                    paddingLeft += popup.arrowHeight
-                }
-            }
-            //下方
-            4 -> {
-                paddingTop = popup.anchorMargin
-                if (popup.showArrow) {
-                    paddingTop += popup.arrowHeight
-                }
-            }
-        }
-        popup.decorRootView.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
-    }
 
-    private fun setAnim() {
-        if (direction == 4) {
-            //下方
-            popup.popupWindow.animationStyle = popup.animStyle ?: -1
-        } else if (direction == 2) {
-            //上方
-            popup.popupWindow.animationStyle = popup.animTopStyle ?: popup.animStyle ?: -1
-        }
-    }
+
 }
