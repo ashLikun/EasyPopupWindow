@@ -114,6 +114,9 @@ open class BaseCommonPopup(
         ViewCompat.setElevation(layouView!!, elevation.toFloat())
     }
 
+    override fun show(anchor: View) {
+        super.show(anchor)
+    }
     override fun onShowInfoCreate(showInfo: ShowInfo) {
         super.onShowInfoCreate(showInfo)
         if (animStyleDirection?.size ?: 0 >= 2) {
