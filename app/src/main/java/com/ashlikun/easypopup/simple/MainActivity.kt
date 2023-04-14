@@ -6,6 +6,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.ashlikun.easypopup.BaseCommonPopup
+import com.ashlikun.easypopup.PopupDirection
 import com.ashlikun.easypopup.simple.databinding.PopupViewBinding
 
 class MainActivity : AppCompatActivity() {
@@ -14,8 +15,31 @@ class MainActivity : AppCompatActivity() {
     }
     val popup: BaseCommonPopup by lazy {
         BaseCommonPopup(
-            this, width = dip2px(180f), maxHeight = dip2px(280f), dimAmount = 0.6f, layouView = popBinding.root
-        ){
+            this,
+            width = dip2px(180f),
+//            maxHeight = dip2px(280f),
+            dimAmount = 0.6f,
+            layouView = popBinding.root,
+            showArrow = true,
+            anchorMargin = dip2px(40f)
+        ) {
+
+        }
+    }
+    val popBinding2 by lazy {
+        PopupViewBinding.inflate(LayoutInflater.from(this))
+    }
+    val popupLeftRight: BaseCommonPopup by lazy {
+        BaseCommonPopup(
+            this,
+            width = dip2px(180f),
+//            maxHeight = dip2px(280f),
+            dimAmount = 0.6f,
+            layouView = popBinding2.root,
+            showArrow = true,
+            direction = PopupDirection.AUTO_LEFT_RIGHT,
+            anchorMargin = dip2px(40f)
+        ) {
 
         }
     }
@@ -35,7 +59,9 @@ class MainActivity : AppCompatActivity() {
         return (dipValue * scale + 0.5f).toInt()
     }
 
-    fun onClick2(view: View) {}
+    fun onClick2(view: View) {
+        popupLeftRight!!.show(view)
+    }
     fun onClick3(view: View) {
         popup!!.show(view)
     }

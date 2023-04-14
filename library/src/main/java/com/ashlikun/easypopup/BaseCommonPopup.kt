@@ -11,6 +11,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.PopupWindow
 import androidx.annotation.IdRes
 import androidx.core.view.ViewCompat
+import kotlin.math.min
 
 /**
  * 作者　　: 李坤
@@ -135,33 +136,38 @@ open class BaseCommonPopup(
         when (showInfo.direction) {
             //左边
             1 -> {
-                paddingRight = anchorMargin
+                showInfo.x = showInfo.x - anchorMargin
                 if (showArrow) {
                     paddingRight += arrowHeight
                 }
             }
             //上方
             2 -> {
-                paddingBottom = anchorMargin
+                showInfo.y = showInfo.y - anchorMargin
                 if (showArrow) {
                     paddingBottom += arrowHeight
                 }
             }
             //右方
             3 -> {
-                paddingLeft = anchorMargin
+                showInfo.x = showInfo.x + anchorMargin
                 if (showArrow) {
                     paddingLeft += arrowHeight
                 }
             }
             //下方
             4 -> {
-                paddingTop = anchorMargin
+                showInfo.y = showInfo.y + anchorMargin
                 if (showArrow) {
                     paddingTop += arrowHeight
                 }
             }
         }
+        showInfo.setViewFrame()
+        //重新设置宽高,去除边界
+        showInfo.width = showInfo.width + paddingLeft + paddingRight
+        showInfo.height = showInfo.height + paddingTop + paddingBottom
+        showInfo.reSetSize()
         decorRootView.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
     }
 }

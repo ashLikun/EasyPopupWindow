@@ -102,34 +102,35 @@ class DecorRootView(context: Context, val popup: BasePopup) : FrameLayout(contex
             arrowPaint.style = Paint.Style.FILL
             arrowPaint.color = popup.bgColor
             arrowPaint.xfermode = null
-            var l = showInfo.anchorFrame.left - showInfo.x + (showInfo.anchorWidth / 2)
-            val t = maxOf(0, showInfo.anchorFrame.bottom - showInfo.y)
-            //移动到箭头顶点
-            canvas.translate(l.toFloat(), t.toFloat())
-
+//            var l = showInfo.anchorFrame.left - showInfo.x + (showInfo.anchorWidth / 2)
+//            val t = maxOf(0, showInfo.anchorFrame.bottom - showInfo.y)
+//            //移动到箭头顶点
+//            canvas.translate(l.toFloat(), t.toFloat())
+//            canvas.drawCircle(0f, 0f, 100f, Paint().also {
+//                it.isAntiAlias = true
+//                it.style = Paint.Style.FILL
+//                it.color = 0xffff0000.toInt()
+//            })
 
             when (showInfo.direction) {
                 //左边
                 1 -> {
-                    canvas.translate(-showInfo.anchorWidth / 2f, -showInfo.anchorHeight / 2f)
-                    canvas.translate((-popup.anchorMargin).toFloat(), 0f)
+                    canvas.translate(showInfo.width.toFloat(), maxOf(0, showInfo.anchorFrame.bottom - showInfo.y) - showInfo.anchorHeight / 2f)
                     canvas.rotate(90f)
                 }
                 //上方
                 2 -> {
-                    canvas.translate(0f, -showInfo.anchorHeight.toFloat())
-                    canvas.translate(0f, (-popup.anchorMargin).toFloat())
+                    canvas.translate(showInfo.anchorFrame.left - showInfo.x + (showInfo.anchorWidth / 2f), showInfo.height.toFloat())
                     canvas.rotate(180f)
                 }
                 //右方
                 3 -> {
-                    canvas.translate(showInfo.anchorWidth / 2f, -showInfo.anchorHeight / 2f)
-                    canvas.translate(popup.anchorMargin.toFloat(), 0f)
+                    canvas.translate(0f, maxOf(0, showInfo.anchorFrame.bottom - showInfo.y) - showInfo.anchorHeight / 2f)
                     canvas.rotate(-90f)
                 }
                 //下方
                 4 -> {
-                    canvas.translate(0f, popup.anchorMargin.toFloat())
+                    canvas.translate(showInfo.anchorFrame.left - showInfo.x + (showInfo.anchorWidth / 2f), 0f)
                 }
             }
 

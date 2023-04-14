@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import kotlin.math.max
+import kotlin.math.min
 
 /**
  * 作者　　: 李坤
@@ -76,10 +77,11 @@ class ShowInfo(anchor: View, val popup: BasePopup) {
     }
 
 
-    internal fun measureLayoutView() {
+    fun measureLayoutView() {
         var needMeasureForWidth = false
         var needMeasureForHeight = false
-
+        //清空Decor padding
+        popup.decorRootView.setPadding(0, 0, 0, 0)
         val pHeight = popup.maxHeight ?: popup.height
         val pWidth = popup.maxWidth ?: popup.width
         width = pWidth
@@ -123,7 +125,9 @@ class ShowInfo(anchor: View, val popup: BasePopup) {
     /**
      * 设置大小
      */
-    internal fun reSetSize() {
+    fun reSetSize() {
+        width = min(metric.widthPixels, width)
+        height = min(metric.heightPixels, height)
         popup.popupWindow.width = width
         popup.popupWindow.height = height
     }
@@ -131,7 +135,7 @@ class ShowInfo(anchor: View, val popup: BasePopup) {
     /**
      * 计算X，Y
      */
-    internal fun calculateXY() {
+    fun calculateXY() {
 
         fun hasGravity(gravity: Int) = popup.gravity and gravity == gravity
 
@@ -206,12 +210,14 @@ class ShowInfo(anchor: View, val popup: BasePopup) {
                 anchorFrame.bottom
             }
         }
+        setViewFrame()
+    }
+
+    fun setViewFrame() {
         viewFrame.left = x
         viewFrame.top = y
         viewFrame.right = x + width
         viewFrame.bottom = y + height
     }
-
-
 
 }
